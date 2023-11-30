@@ -1,0 +1,14 @@
+npm install -g typescript - install typescript global
+
+npm init -y
+tsc --init
+npm install ts-node --save-dev
+
+npm install express
+npm install @types/express -- save-dev
+npm install sequelize
+npm install mysql2
+npm install @types/sequelize --save-dev
+npm install nodemon --save-dev
+
+tsc - transformare cod ts in js
