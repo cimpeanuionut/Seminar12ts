@@ -1,22 +1,31 @@
 import db from '../dbConfig';
-import Sequelize from 'sequelize';
+import Sequelize, { ModelDefined } from 'sequelize';
 
-const Address = db.define("Address", 
+export interface AddressAttributes{
+    AddressId: number,
+    AddressDetail: string,
+    AddressCity: string,
+    EmployeeId: number
+}
+
+export interface AddressCreationAttributes extends AddressAttributes {}
+
+const Address : ModelDefined<AddressAttributes, AddressCreationAttributes> = db.define("Address", 
 {
-    AdresaId:
+    AddressId:
     {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false
     },
-    AdresaDetail: 
+    AddressDetail: 
     {
         type: Sequelize.STRING,
         allowNull: false
     },
 
-    City:
+    AddressCity:
     {
         type: Sequelize.STRING,
         allowNull: false

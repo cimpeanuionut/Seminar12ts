@@ -1,7 +1,23 @@
 import db from '../dbConfig';
 import Sequelize from 'sequelize';
+import { ModelDefined } from 'sequelize';
+import { AddressAttributes } from './Address';
 
-const Employee = db.define("Employee", 
+export interface EmployeeAttributes{
+    EmployeeId : number,
+    EmployeeName: string,
+    EmployeeSurName: string,
+    EmployeeAge: number,
+    EmployeeOccupation: string,
+    EmployeePhone: string | null,
+    EmployeeEmail: string | null,
+    Addresses: AddressAttributes[]
+   
+}
+
+export interface EmployeeCreationAttributes extends EmployeeAttributes {}
+
+const Employee : ModelDefined<EmployeeAttributes, EmployeeCreationAttributes> = db.define("Employee", 
 {
     EmployeeId:
     {

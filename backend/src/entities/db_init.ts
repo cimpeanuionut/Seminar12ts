@@ -2,6 +2,7 @@ import mysql from 'mysql2/promise.js'
 import env from 'dotenv';
 import Employee from './Employee';
 import Address from './Address';
+import { Addresses } from './dbConst';
 
 env.config();
 
@@ -20,13 +21,13 @@ function createDatabase(){
 
 function fkConfig()
 {
-    Employee.hasMany(Address, {as : "Addresses", foreignKey: "EmployeeId"});
+    Employee.hasMany(Address, {as : Addresses, foreignKey: "EmployeeId"});
     Address.belongsTo(Employee, { foreignKey: "EmployeeId"})    
 }
 
 function db_init(){
     createDatabase();
-    fkConfig();
+    fkConfig();    
 }
 
 export default db_init;
