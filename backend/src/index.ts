@@ -3,6 +3,7 @@ import env from 'dotenv';
 import db_init from "./entities/db_init";
 import masterRouter from "./routes/masterRouter";
 import employeeRouter from "./routes/employeeRouter";
+import cors from "cors";
 
 env.config();
 
@@ -12,6 +13,13 @@ app.use(express.json());
 app.use(express.urlencoded({
   extended: true
 }));
+
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  methods: 'GET,PUT,PATCH,POST,DELETE'
+};
+
+app.use(cors(corsOptions));
 
 db_init();
 
