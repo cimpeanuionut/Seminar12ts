@@ -9,7 +9,7 @@ employeeRouter.route('/employee').post( async (req, res) => {
 })
 
 employeeRouter.route('/employee').get( async (req, res) => {  
-  var queryParams = new employeeFilterDto(req.query)
+  var queryParams = new employeeFilterDto(req.query) 
   return res.json(await getEmployees(queryParams));
 })
 

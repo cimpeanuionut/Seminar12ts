@@ -27,7 +27,7 @@ async function getEmployees(employeeFilter: employeeFilterDto){
     {   
       distinct: true,      
       where: whereClause,
-      limit: parseInt(employeeFilter.take.toString()),
+      limit: employeeFilter.take,
       offset: employeeFilter.skip * employeeFilter.take,
     });
 

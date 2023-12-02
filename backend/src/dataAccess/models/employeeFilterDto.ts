@@ -5,7 +5,8 @@ export default class employeeFilterDto extends paginationDto{
     employeeSurName!: string | null  
 
     constructor(obj : Partial<employeeFilterDto>){
-        super(obj);
+        super();        
         Object.assign(this, obj);
+        this.setTakeAndSkip(this.take, this.skip)       
     }
 }
