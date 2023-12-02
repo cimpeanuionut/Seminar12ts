@@ -28,7 +28,7 @@ export default function EmployeesList() {
     employeeName: "",
     employeeSurName: "",
     take: 5,
-    skip: 1
+    skip: 0
   });
   const navigate = useNavigate();  
 
@@ -46,7 +46,7 @@ export default function EmployeesList() {
   ) => {
     setPage(newPage);
     let newFilter = _.cloneDeep(employeeFilter); 
-    newFilter.skip = newPage + 1;    
+    newFilter.skip = newPage;    
     await filter(newFilter);  
     setEmployeeFilter(newFilter);     
   };
@@ -60,7 +60,7 @@ export default function EmployeesList() {
 
     let newFilter = _.cloneDeep(employeeFilter); 
     newFilter.take = take;   
-    newFilter.skip = 1; 
+    newFilter.skip = 0; 
     await filter(newFilter); 
     setEmployeeFilter(newFilter); 
   };
@@ -75,11 +75,14 @@ export default function EmployeesList() {
   }
 
   async function filterEmployee() {
-    filter(employeeFilter)
+    setPage(0)
+    let empFilter = _.cloneDeep(employeeFilter);
+    empFilter.skip = 0
+    filter(empFilter)    
   }
 
   async function clearFilters(){
-    let newFilter = {employeeName: "", employeeSurName: "", skip: 1, take: 5};
+    let newFilter = {employeeName: "", employeeSurName: "", skip: 0, take: 5};
     setPage(0)
     setRowsPerPage(5);
     setEmployeeFilter(newFilter);
