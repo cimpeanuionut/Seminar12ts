@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { get } from "../api/Calls";
 import { Employee } from "../models/Employee";
 import Table from '@mui/material/Table';
@@ -11,50 +11,130 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TablePaginationActions from "../components/TablePaginationActions";
 import { PaginationResponse } from "../models/PaginationResponse";
-import { Button, TableHead } from "@mui/material";
+import { Box, Button, TableHead, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { EmployeeFilterDto } from "../models/EmployeeFilterDto";
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import ClearIcon from '@mui/icons-material/Clear';
+import _ from "lodash";
 
 export default function EmployeesList() {
 
   const [employees, setEmployees] = useState<PaginationResponse<Employee>>({ count: 0, rows: [] })
-  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const navigate = useNavigate();
+  const [page, setPage] = useState(0)
+  const [employeeFilter, setEmployeeFilter] = useState<EmployeeFilterDto>({
+    employeeName: "",
+    employeeSurName: "",
+    take: 5,
+    skip: 1
+  });
+  const navigate = useNavigate();  
 
   useEffect(() => {
-    getEmployees().then(d => { setEmployees(d); })
+    getEmployees(employeeFilter).then(d => { setEmployees(d); })
   }, [])
 
-  async function getEmployees() {
-    return (await get("/employee")) as PaginationResponse<Employee>;
-  }
+  async function getEmployees(employeeFilter: EmployeeFilterDto) {
+    return (await get("/employee", employeeFilter)) as PaginationResponse<Employee>;
+  } 
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - employees.rows.length) : 0;
-
-  const handleChangePage = (
+  const handleChangePage = async (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number,
   ) => {
     setPage(newPage);
+    let newFilter = _.cloneDeep(employeeFilter); 
+    newFilter.skip = newPage + 1;    
+    await filter(newFilter);  
+    setEmployeeFilter(newFilter);     
   };
 
-  const handleChangeRowsPerPage = (
+  const handleChangeRowsPerPage = async (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    let take = parseInt(event.target.value, 10)
+    setRowsPerPage(take);   
     setPage(0);
+
+    let newFilter = _.cloneDeep(employeeFilter); 
+    newFilter.take = take;   
+    newFilter.skip = 1; 
+    await filter(newFilter); 
+    setEmployeeFilter(newFilter); 
   };
 
-  function newEmployee(){
+  function newEmployee() {
     navigate("/NewEmployee")
   }
 
-  return (
-    <div>    
+  function onChangeFilter(e: ChangeEvent<HTMLInputElement>) {
+    e.preventDefault();
+    setEmployeeFilter({ ...employeeFilter, [e.target.name]: e.target.value });
+  }
 
-      <Button startIcon={<AddCircleIcon/>} variant="contained" onClick={newEmployee}>New Employee</Button>   
+  async function filterEmployee() {
+    filter(employeeFilter)
+  }
+
+  async function clearFilters(){
+    let newFilter = {employeeName: "", employeeSurName: "", skip: 1, take: 5};
+    setPage(0)
+    setRowsPerPage(5);
+    setEmployeeFilter(newFilter);
+    filter(newFilter)
+  }
+
+  async function filter(filter : EmployeeFilterDto){
+    let filterEmployees = await getEmployees(filter);
+    setEmployees(filterEmployees);
+  }
+
+  return (
+    <div>
+
+      <Box
+        component="form"
+        sx={{
+          '& .MuiTextField-root': { m: 1, width: '25ch' },
+        }}
+        noValidate
+        style={{ marginBottom: '30px' }}
+      >
+
+        <h1>Filters</h1>
+        <div>
+
+          <TextField
+            label="employeeName"
+            value={employeeFilter.employeeName}
+            onChange={onChangeFilter}
+            name="employeeName"
+          />
+
+          <TextField
+            label="employeeSurName"
+            value={employeeFilter.employeeSurName}
+            onChange={onChangeFilter}
+            name="employeeSurName"
+          />
+
+        </div>
+
+        <div>
+          <Button style={{ marginRight: '8px' }} startIcon={<FilterAltIcon />} variant="contained" onClick={filterEmployee}>
+            Filter
+          </Button>
+
+          <Button startIcon={<ClearIcon />} variant="contained" onClick={clearFilters}>
+            Clear Filters
+          </Button>
+        </div>
+
+      </Box>
+
+      <Button startIcon={<AddCircleIcon />} variant="contained" onClick={newEmployee}>New Employee</Button>
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
@@ -64,13 +144,12 @@ export default function EmployeesList() {
               <TableCell>Employee SurName</TableCell>
               <TableCell>Employee Age</TableCell>
               <TableCell>Employee Occupation</TableCell>
+              <TableCell>Employee Phone</TableCell>
+              <TableCell>Employee Email</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {(rowsPerPage > 0
-              ? employees.rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : employees.rows
-            ).map((row) => (
+            {employees.rows.map((row) => (
               <TableRow key={row.EmployeeId}>
                 <TableCell align="left">
                   {row.EmployeeName}
@@ -84,13 +163,14 @@ export default function EmployeesList() {
                 <TableCell align="left">
                   {row.EmployeeOccupation}
                 </TableCell>
+                <TableCell align="left">
+                  {row.EmployeePhone}
+                </TableCell>
+                <TableCell align="left">
+                  {row.EmployeeEmail}
+                </TableCell>
               </TableRow>
-            ))}
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )}
+            ))}            
           </TableBody>
           <TableFooter>
             <TableRow>

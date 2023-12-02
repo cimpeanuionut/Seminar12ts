@@ -18,9 +18,9 @@ api.interceptors.response.use(
     }
 );
 
-async function get(url: string, id: any = null) {
+async function get(url: string, queryParams: any = null, id: any = null) {
     let newUrl = !id ? url : url + "/" + id;
-    return (await api.get(newUrl)).data;
+    return (await api.get(newUrl, { params: queryParams })).data;
 }
 
 async function post(url: string, item: any) {

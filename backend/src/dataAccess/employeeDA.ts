@@ -8,13 +8,13 @@ async function createEmployee(employee: EmployeeCreationAttributes) {
     return await Employee.create(employee, {include: [{model: Address, as: Addresses}]});
   }
 
-async function getEmployees(employeeFilter: employeeFilterDto){
+async function getEmployees(employeeFilter: employeeFilterDto){ 
    
   if (!employeeFilter.take)
     employeeFilter.take = 10;
 
   if (!employeeFilter.skip)
-    employeeFilter.skip = 1;  
+    employeeFilter.skip = 1;      
 
   let whereClause : any = {};
   if (employeeFilter.employeeName)
@@ -26,7 +26,7 @@ async function getEmployees(employeeFilter: employeeFilterDto){
   let whereAddressClause : any = {};
 
   if (employeeFilter.addressCity)
-    whereAddressClause.AddressCity = {[Like]: `%${employeeFilter.addressCity}%`};
+    whereAddressClause.AddressCity = {[Like]: `%${employeeFilter.addressCity}%`};   
 
   return await Employee.findAndCountAll (
     {   
@@ -41,7 +41,7 @@ async function getEmployees(employeeFilter: employeeFilterDto){
         }
       ],
       where: whereClause,
-      limit: employeeFilter.take,
+      limit: parseInt(employeeFilter.take.toString()),
       offset: (employeeFilter.skip - 1) * employeeFilter.take, // skip este pagina curenta iar take sunt cate inregistrari vin pe pagina
     });
 
