@@ -1,3 +1,5 @@
+import { Address } from "./Address"
+
 export interface Employee{
     EmployeeId : number,
     EmployeeName: string,
@@ -5,5 +7,6 @@ export interface Employee{
     EmployeeAge: number,
     EmployeeOccupation: string,
     EmployeePhone: string | null,
-    EmployeeEmail: string | null   
+    EmployeeEmail: string | null,
+    Addresses: Address[]   
 }

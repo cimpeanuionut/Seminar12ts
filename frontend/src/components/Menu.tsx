@@ -11,6 +11,7 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { routes } from '../routes';
 import { useNavigate } from 'react-router-dom';
+import "../css/menu.css"
 
 const pages = routes.filter(r => r.name);
 
@@ -32,7 +33,7 @@ function ResponsiveAppBar() {
   }
 
   return (
-    <AppBar position="static">
+    <AppBar className='menu' position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
