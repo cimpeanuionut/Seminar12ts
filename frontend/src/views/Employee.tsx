@@ -1,5 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { get } from "../api/Calls";
+import { get, remove } from "../api/Calls";
 import { Employee } from "../models/Employee";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -18,6 +18,8 @@ import { EmployeeFilterDto } from "../models/EmployeeFilterDto";
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ClearIcon from '@mui/icons-material/Clear';
 import _ from "lodash";
+import EditIcon from '@mui/icons-material/Edit';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 export default function EmployeesList() {
 
@@ -30,7 +32,7 @@ export default function EmployeesList() {
     take: 5,
     skip: 0
   });
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
 
   useEffect(() => {
     getEmployees(employeeFilter).then(d => { setEmployees(d); })
@@ -38,31 +40,31 @@ export default function EmployeesList() {
 
   async function getEmployees(employeeFilter: EmployeeFilterDto) {
     return (await get("/employee", employeeFilter)) as PaginationResponse<Employee>;
-  } 
+  }
 
   const handleChangePage = async (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number,
   ) => {
     setPage(newPage);
-    let newFilter = _.cloneDeep(employeeFilter); 
-    newFilter.skip = newPage;    
-    await filter(newFilter);  
-    setEmployeeFilter(newFilter);     
+    let newFilter = _.cloneDeep(employeeFilter);
+    newFilter.skip = newPage;
+    await filter(newFilter);
+    setEmployeeFilter(newFilter);
   };
 
   const handleChangeRowsPerPage = async (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     let take = parseInt(event.target.value, 10)
-    setRowsPerPage(take);   
+    setRowsPerPage(take);
     setPage(0);
 
-    let newFilter = _.cloneDeep(employeeFilter); 
-    newFilter.take = take;   
-    newFilter.skip = 0; 
-    await filter(newFilter); 
-    setEmployeeFilter(newFilter); 
+    let newFilter = _.cloneDeep(employeeFilter);
+    newFilter.take = take;
+    newFilter.skip = 0;
+    await filter(newFilter);
+    setEmployeeFilter(newFilter);
   };
 
   function newEmployee() {
@@ -78,20 +80,26 @@ export default function EmployeesList() {
     setPage(0)
     let empFilter = _.cloneDeep(employeeFilter);
     empFilter.skip = 0
-    filter(empFilter)    
+    filter(empFilter)
   }
 
-  async function clearFilters(){
-    let newFilter = {employeeName: "", employeeSurName: "", skip: 0, take: 5};
+  async function clearFilters() {
+    let newFilter = { employeeName: "", employeeSurName: "", skip: 0, take: 5 };
     setPage(0)
     setRowsPerPage(5);
     setEmployeeFilter(newFilter);
     filter(newFilter)
   }
 
-  async function filter(filter : EmployeeFilterDto){
+  async function filter(filter: EmployeeFilterDto) {
     let filterEmployees = await getEmployees(filter);
     setEmployees(filterEmployees);
+  }
+
+  async function deleteEmployee(employeeId: number){
+    await remove("/employee", employeeId);
+    let ret = await getEmployees(employeeFilter);
+    setEmployees(ret);
   }
 
   return (
@@ -137,7 +145,7 @@ export default function EmployeesList() {
 
       </Box>
 
-      <Button startIcon={<AddCircleIcon />} variant="contained" onClick={newEmployee}>New Employee</Button>
+      <Button style={{ marginBottom: '20px' }} startIcon={<AddCircleIcon />} variant="contained" onClick={newEmployee}>New Employee</Button>
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
@@ -149,6 +157,8 @@ export default function EmployeesList() {
               <TableCell>Employee Occupation</TableCell>
               <TableCell>Employee Phone</TableCell>
               <TableCell>Employee Email</TableCell>
+              <TableCell>Edit</TableCell>
+              <TableCell>Delete</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -172,8 +182,21 @@ export default function EmployeesList() {
                 <TableCell align="left">
                   {row.EmployeeEmail}
                 </TableCell>
+                <TableCell>
+                  <Button
+                    startIcon={<EditIcon />}
+                    color="success"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Button 
+                    startIcon={<CancelIcon />}
+                    color="error"
+                    onClick={() => deleteEmployee(row.EmployeeId)}
+                  />
+                </TableCell>
               </TableRow>
-            ))}            
+            ))}
           </TableBody>
           <TableFooter>
             <TableRow>
