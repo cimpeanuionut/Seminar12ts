@@ -70,7 +70,7 @@ export default function EmployeeEdit() {
             AddressId: 0,
             AddressCity: "",
             AddressDetail: "",
-            EmployeeId: 0
+            EmployeeId: id ?  Number(id) : 0
         })
         setIsNewAddress(true)
     };

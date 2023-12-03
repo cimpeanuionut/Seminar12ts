@@ -3,6 +3,7 @@ import Address from "../entities/Address";
 import { Addresses } from "../entities/dbConst";
 import { Like } from "./operators";
 import employeeFilterDto from "./models/employeeFilterDto";
+import db from "../dbConfig";
 
 async function createEmployee(employee: EmployeeCreationAttributes) {
   return await Employee.create(employee, { include: [{ model: Address, as: Addresses }] });
@@ -54,7 +55,49 @@ async function updateEmployee(employee: EmployeeCreationAttributes, id: number) 
     console.log("This employee does not exist");
     return;
   }
+
+  const t = await db.transaction()
+  try{
   await findEmployee.update(employee);
+
+   // deleted
+   const existAddress = await Address.findAll({
+    where: {
+      EmployeeId: employee.EmployeeId,
+    },
+  });
+
+  if (existAddress.length > 0){
+    let addressIds = existAddress.map(a => a.dataValues.AddressId);
+    let addressIdsDeleted = addressIds.filter(id => !employee.Addresses.find(add => add.AddressId === id)?.AddressId)
+    if (addressIdsDeleted.length > 0)
+      await Address.destroy({
+        where: {
+          AddressId: addressIdsDeleted,
+        },})
+  }
+
+  // inserted 
+  const insertedA = employee.Addresses.filter(a => a.AddressId === 0)
+  if (insertedA.length > 0)
+    await Address.bulkCreate(insertedA)
+
+  // updated
+  const updatedA = employee.Addresses.filter(a => a.AddressId !== 0);
+  if (updatedA.length > 0)
+  {
+    for (let item of updatedA){
+      const findA = await Address.findByPk(item.AddressId);
+      await findA?.update(item);
+    }
+  } 
+
+  await t.commit();
+
+  }catch(e){
+    await t.rollback();
+    throw e;
+  }
 }
 
 export {
