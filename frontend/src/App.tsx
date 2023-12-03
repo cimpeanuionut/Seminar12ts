@@ -10,7 +10,7 @@ function App() {
       
       <Routes>
         {routes.map((r, index) => (
-          <Route key = {index} path={r.path} element={r.component()} />
+          <Route key = {index} path={r.path} element={<r.component />} />
         ))}
       </Routes>
     </div>

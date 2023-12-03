@@ -102,6 +102,10 @@ export default function EmployeesList() {
     setEmployees(ret);
   }
 
+  async function editEmployee(employeeId: number){
+    navigate(`/EditEmployee/${employeeId}`);
+  }
+
   return (
     <div>
 
@@ -186,6 +190,7 @@ export default function EmployeesList() {
                   <Button
                     startIcon={<EditIcon />}
                     color="success"
+                    onClick={() => editEmployee(row.EmployeeId)}
                   />
                 </TableCell>
                 <TableCell>

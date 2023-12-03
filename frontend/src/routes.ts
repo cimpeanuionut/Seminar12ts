@@ -29,5 +29,10 @@ export const routes = Object.freeze([
         path:"/NewEmployee/",
         component: EmployeeEdit,
         name: null
+    },
+    {
+        path:"/EditEmployee/:id",
+        component: EmployeeEdit,
+        name: null
     }
 ]);

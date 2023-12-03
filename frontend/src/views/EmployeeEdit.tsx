@@ -1,10 +1,10 @@
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 import { Employee } from "../models/Employee"
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { useNavigate } from "react-router-dom";
-import { post } from "../api/Calls";
+import { useNavigate, useParams } from "react-router-dom";
+import { post, get } from "../api/Calls";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Address } from "../models/Address";
 import _ from 'lodash';
@@ -30,9 +30,18 @@ export default function EmployeeEdit() {
     })
 
     const navigation = useNavigate();
+    const {id} = useParams();   
 
     const [isNewAddress, setIsNewAddress] = useState<boolean>(true);
     const [addressIndex, setAddressIndex] = useState<number>(0);
+
+    useEffect(() => {
+        if (!id)
+            return;
+
+        get("/employee", null, id)
+        .then(r => setEmployee(r));
+    }, [])
 
     function onChangeEmployee(e: ChangeEvent<HTMLInputElement>) {
         e.preventDefault();
