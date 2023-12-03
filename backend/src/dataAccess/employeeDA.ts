@@ -57,44 +57,44 @@ async function updateEmployee(employee: EmployeeCreationAttributes, id: number) 
   }
 
   const t = await db.transaction()
-  try{
-  await findEmployee.update(employee);
+  try {
+    await findEmployee.update(employee);
 
-   // deleted
-   const existAddress = await Address.findAll({
-    where: {
-      EmployeeId: employee.EmployeeId,
-    },
-  });
+    // deleted
+    const existAddress = await Address.findAll({
+      where: {
+        EmployeeId: employee.EmployeeId,
+      },
+    });
 
-  if (existAddress.length > 0){
-    let addressIds = existAddress.map(a => a.dataValues.AddressId);
-    let addressIdsDeleted = addressIds.filter(id => !employee.Addresses.find(add => add.AddressId === id)?.AddressId)
-    if (addressIdsDeleted.length > 0)
-      await Address.destroy({
-        where: {
-          AddressId: addressIdsDeleted,
-        },})
-  }
-
-  // inserted 
-  const insertedA = employee.Addresses.filter(a => a.AddressId === 0)
-  if (insertedA.length > 0)
-    await Address.bulkCreate(insertedA)
-
-  // updated
-  const updatedA = employee.Addresses.filter(a => a.AddressId !== 0);
-  if (updatedA.length > 0)
-  {
-    for (let item of updatedA){
-      const findA = await Address.findByPk(item.AddressId);
-      await findA?.update(item);
+    if (existAddress.length > 0) {
+      let addressIds = existAddress.map(a => a.dataValues.AddressId);
+      let addressIdsDeleted = addressIds.filter(id => !employee.Addresses.find(add => add.AddressId === id)?.AddressId)
+      if (addressIdsDeleted.length > 0)
+        await Address.destroy({
+          where: {
+            AddressId: addressIdsDeleted,
+          },
+        })
     }
-  } 
 
-  await t.commit();
+    // inserted 
+    const insertedA = employee.Addresses.filter(a => a.AddressId === 0)
+    if (insertedA.length > 0)
+      await Address.bulkCreate(insertedA)
 
-  }catch(e){
+    // updated
+    const updatedA = employee.Addresses.filter(a => a.AddressId !== 0);
+    if (updatedA.length > 0) {
+      for (let item of updatedA) {
+        const findA = await Address.findByPk(item.AddressId);
+        await findA?.update(item);
+      }
+    }
+
+    await t.commit();
+
+  } catch (e) {
     await t.rollback();
     throw e;
   }
