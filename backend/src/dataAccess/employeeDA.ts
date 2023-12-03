@@ -47,9 +47,20 @@ async function deleteEmployee(id: number) {
   return await deleteElem.destroy();
 }
 
+async function updateEmployee(employee: EmployeeCreationAttributes, id: number) {
+  const findEmployee = await getEmployeeById(employee.EmployeeId);
+
+  if (!findEmployee) {
+    console.log("This employee does not exist");
+    return;
+  }
+  await findEmployee.update(employee);
+}
+
 export {
   createEmployee,
   getEmployeeById,
   getEmployees,
-  deleteEmployee
+  deleteEmployee,
+  updateEmployee
 }

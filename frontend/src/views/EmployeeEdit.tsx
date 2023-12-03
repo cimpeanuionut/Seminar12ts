@@ -4,7 +4,7 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, D
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useNavigate, useParams } from "react-router-dom";
-import { post, get } from "../api/Calls";
+import { post, get, put } from "../api/Calls";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Address } from "../models/Address";
 import _ from 'lodash';
@@ -53,7 +53,12 @@ export default function EmployeeEdit() {
     }
 
     async function saveEmployee() {
-        await post("/employee", employee);
+        if (!id){
+            await post("/employee", employee);
+        }
+        else{
+            await put("/employee", employee.EmployeeId, employee);
+        }
         navigation("/Employee");
     }
 
